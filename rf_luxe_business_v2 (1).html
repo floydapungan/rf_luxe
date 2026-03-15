@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RF Luxe — Business Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#B8972E; --gold2:#D4AF55; --gold3:#F0D080; --gold-soft:#EDD87A;
+  --white:#FFFFFF; --off-white:#FAF8F4; --cream:#F5F0E8; --cream2:#EDE5D5;
+  --border:#E8DFC8; --border2:#D4C8A8;
+  --text:#1A1510; --text2:#4A3F2F; --text3:#8A7A60; --text4:#B8A888;
+  --green:#2E7D5E; --green-bg:#EBF5F0; --red:#C0392B; --red-bg:#FDECEA;
+  --blue:#2563EB; --blue-bg:#EBF2FF;
+  --shadow-sm:0 1px 4px rgba(90,70,30,0.08); --shadow:0 4px 20px rgba(90,70,30,0.12); --shadow-lg:0 8px 40px rgba(90,70,30,0.18);
+  --r:14px; --r-sm:8px; --r-lg:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;
+  box-shadow:0 1px 8px rgba(90,70,30,0.06);
+}
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.logo-icon{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px;
+  font-family:'Cormorant Garamond',serif;
+  box-shadow:0 2px 8px rgba(184,151,46,0.35);
+}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--text);line-height:1.1;}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;font-family:'DM Sans',sans-serif;font-weight:400;}
+.topbar-right{text-align:right;}
+.topbar-date{font-size:11px;font-weight:500;color:var(--text2);}
+.topbar-time{font-size:10px;color:var(--text3);}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;
+  padding:6px 0 max(8px,env(safe-area-inset-bottom));
+  box-shadow:0 -2px 16px rgba(90,70,30,0.08);
+}
+.nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;color:var(--text4);
+  font-size:9px;font-family:'DM Sans',sans-serif;letter-spacing:.5px;font-weight:500;
+  cursor:pointer;padding:5px 8px;border-radius:10px;transition:all .2s;
+  min-width:52px;text-transform:uppercase;
+}
+.nav-icon{font-size:18px;line-height:1;transition:transform .2s;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn.active .nav-icon{transform:scale(1.15);}
+
+/* ── MAIN ── */
+.main{padding:72px 16px 86px;max-width:460px;margin:0 auto;}
+.screen{display:none;animation:fadeUp .25s ease;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.page-hdr{margin-bottom:20px;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.1;}
+.page-sub{font-size:12px;color:var(--text3);margin-top:3px;font-weight:400;}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;
+  box-shadow:var(--shadow-sm);
+}
+.stat-card.wide{grid-column:1/-1;}
+.stat-lbl{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:600;margin-bottom:6px;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--text);line-height:1;}
+.stat-val.g{color:var(--green);}
+.stat-val.r{color:var(--red);}
+.stat-val.gold{color:var(--gold);}
+.stat-note{font-size:10px;color:var(--text4);margin-top:3px;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;margin-bottom:12px;
+  box-shadow:var(--shadow-sm);
+}
+.card-gold{
+  background:linear-gradient(135deg,#FDF8EC,#FAF3DC);
+  border-color:rgba(184,151,46,0.25);
+}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:14px;}
+.form-lbl{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:6px;display:block;}
+.form-ctrl{
+  width:100%;background:var(--off-white);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:11px 13px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.form-ctrl:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,151,46,0.1);}
+.form-ctrl::placeholder{color:var(--text4);}
+select.form-ctrl{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7A60' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+textarea.form-ctrl{resize:vertical;min-height:74px;line-height:1.5;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row3{display:grid;grid-template-columns:2fr 1fr 1.5fr;gap:8px;}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  width:100%;background:linear-gradient(135deg,var(--gold2),var(--gold));
+  border:none;border-radius:var(--r-sm);padding:14px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;letter-spacing:.3px;transition:all .2s;
+  box-shadow:0 3px 12px rgba(184,151,46,0.3);
+}
+.btn-primary:active{transform:scale(0.98);opacity:.9;}
+.btn-secondary{
+  width:100%;background:var(--white);border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);padding:12px;
+  color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  cursor:pointer;transition:all .2s;
+}
+.btn-secondary:active{background:var(--cream);}
+.btn-icon{
+  background:var(--cream);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 14px;
+  color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-icon:hover{background:var(--cream2);}
+.btn-del{
+  background:var(--red-bg);border:1px solid rgba(192,57,43,0.2);
+  border-radius:6px;padding:5px 10px;color:var(--red);
+  font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.btn-del:hover{background:#fbd5d2;}
+.btn-edit{
+  background:var(--blue-bg);border:1px solid rgba(37,99,235,0.2);
+  border-radius:6px;padding:5px 10px;color:var(--blue);
+  font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+
+/* ── FLOATING ADD BUTTON ── */
+.fab{
+  position:fixed;bottom:96px;right:20px;z-index:150;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  border:none;color:#fff;font-size:26px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(184,151,46,0.45);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;
+}
+.fab:active{transform:scale(0.92);}
+.fab.hidden{display:none;}
+
+/* ── LIST ITEMS ── */
+.list-item{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:8px;
+  box-shadow:var(--shadow-sm);
+  display:flex;justify-content:space-between;align-items:flex-start;
+  transition:box-shadow .2s;
+}
+.list-item:active{box-shadow:var(--shadow);}
+.li-info{flex:1;min-width:0;}
+.li-title{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-sub{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.4;}
+.li-right{text-align:right;min-width:76px;margin-left:10px;flex-shrink:0;}
+.amt-pos{color:var(--green);font-weight:700;font-size:14px;}
+.amt-neg{color:var(--red);font-weight:700;font-size:14px;}
+.amt-gold{color:var(--gold);font-weight:700;font-size:14px;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.bg{background:var(--green-bg);color:var(--green);}
+.bgold{background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;border:1px solid #F6D860;}
+.br{background:var(--red-bg);color:var(--red);}
+.bblue{background:var(--blue-bg);color:var(--blue);}
+.bgray{background:var(--cream);color:var(--text3);border:1px solid var(--border);}
+
+/* ── BADGES colors ── */
+.color-dot{
+  display:inline-block;width:10px;height:10px;border-radius:50%;
+  border:1px solid rgba(0,0,0,0.12);margin-right:4px;vertical-align:middle;flex-shrink:0;
+}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:20px;padding:7px 16px;color:var(--text3);
+  font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;
+  transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.3px;
+}
+.tab.active{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(184,151,46,0.3);}
+
+/* ── CALENDAR ── */
+.cal-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.cal-mnth{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--text);}
+.cal-arr{background:var(--cream);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);font-size:18px;font-weight:700;}
+.cal-grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dh{text-align:center;font-size:9px;color:var(--text4);letter-spacing:1px;padding:4px 0;font-weight:700;}
+.cal-d{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:13px;cursor:pointer;position:relative;
+  transition:background .15s;color:var(--text2);font-weight:500;
+}
+.cal-d:hover{background:var(--cream);}
+.cal-d.has-ev::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold);}
+.cal-d.today{background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;font-weight:700;}
+.cal-d.sel{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#fff;font-weight:700;}
+.cal-d.other{color:var(--text4);}
+
+/* ── PROGRESS ── */
+.prog-wrap{background:var(--cream);border-radius:6px;height:8px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold3));transition:width .5s;}
+
+/* ── MODALS ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(20,15,5,0.5);
+  z-index:500;display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+  backdrop-filter:blur(3px);
+}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--white);border-radius:22px 22px 0 0;
+  border-top:1px solid var(--border);
+  padding:0 0 max(20px,env(safe-area-inset-bottom));
+  width:100%;max-height:92vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.1,.64,1);
+}
+.overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 0;}
+.modal-hdr{padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--text);}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--cream);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px;}
+.modal-body{padding:16px 20px 20px;}
+
+/* ── SECTION DIVIDER ── */
+.sec-div{
+  display:flex;align-items:center;gap:10px;
+  color:var(--text4);font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;font-weight:700;margin:18px 0 12px;
+}
+.sec-div::before,.sec-div::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── ADD-ONS SECTION ── */
+.addons-section{
+  background:linear-gradient(135deg,#FDFAF3,#FAF5E8);
+  border:1.5px solid rgba(184,151,46,0.2);
+  border-radius:var(--r);padding:14px;margin-bottom:14px;
+}
+.addons-title{
+  font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;
+  color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.addon-row{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:12px;margin-bottom:8px;
+  box-shadow:var(--shadow-sm);
+}
+.addon-row-top{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;}
+.addon-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;}
+.addon-select{
+  width:100%;background:var(--off-white);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 30px 9px 11px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  outline:none;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A7A60' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  transition:border-color .2s;
+}
+.addon-select:focus{border-color:var(--gold);}
+.addon-qty{
+  width:100%;background:var(--off-white);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 11px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;text-align:center;
+  outline:none;transition:border-color .2s;
+}
+.addon-qty:focus{border-color:var(--gold);}
+.btn-remove-addon{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--red-bg);border:1px solid rgba(192,57,43,0.15);
+  color:var(--red);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.color-preview{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:20px;
+  background:var(--cream);border:1px solid var(--border);
+  font-size:11px;font-weight:600;color:var(--text2);
+}
+.btn-add-addon{
+  width:100%;background:var(--off-white);border:1.5px dashed var(--border2);
+  border-radius:10px;padding:10px;color:var(--gold);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .2s;
+}
+.btn-add-addon:hover{background:var(--cream);border-color:var(--gold2);}
+
+/* ── ADDON VIEW (display in booking card) ── */
+.addon-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.addon-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#FEF9EC,#FDF3D0);
+  border:1px solid rgba(184,151,46,0.25);
+  border-radius:20px;padding:4px 10px;
+  font-size:11px;font-weight:600;color:#7A5C1A;
+}
+
+/* ── BOOKING VIEW CARD ── */
+.booking-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.booking-card-hdr{
+  padding:14px 16px 10px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.booking-card-body{padding:12px 16px;}
+.booking-card-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;color:var(--text2);}
+.booking-card-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.booking-card-ftr{
+  padding:10px 16px;border-top:1px solid var(--border);
+  background:var(--off-white);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.booking-actions{display:flex;gap:6px;}
+
+/* ── INVENTORY ── */
+.inv-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
+  box-shadow:var(--shadow-sm);
+}
+.inv-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0;}
+.inv-num-box{text-align:center;padding:8px;background:var(--off-white);border-radius:8px;}
+.inv-num-val{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--text);}
+.inv-num-val.out{color:var(--red);}
+.inv-num-val.avail{color:var(--green);}
+.inv-num-lbl{font-size:9px;color:var(--text4);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-top:1px;}
+
+/* ── ROI BARS ── */
+.roi-row{margin-bottom:10px;}
+.roi-lbl-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:5px;font-weight:500;}
+.roi-track{background:var(--cream);border-radius:6px;height:10px;overflow:hidden;}
+.roi-fill{height:100%;border-radius:6px;transition:width .6s;}
+.roi-fill.income{background:linear-gradient(90deg,#1B6D50,var(--green));}
+.roi-fill.expense{background:linear-gradient(90deg,#9B2318,var(--red));}
+.roi-fill.profit{background:linear-gradient(90deg,var(--gold),var(--gold3));}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--text4);}
+.empty-ico{font-size:36px;margin-bottom:10px;opacity:.5;}
+.empty-txt{font-size:13px;color:var(--text3);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--text);border-radius:24px;padding:10px 20px;
+  color:#fff;font-size:13px;z-index:999;opacity:0;
+  transition:all .3s;white-space:nowrap;font-weight:500;
+  box-shadow:0 4px 20px rgba(0,0,0,0.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── RELEASE ITEM ── */
+.release-item{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;margin-bottom:6px;
+  display:flex;justify-content:space-between;align-items:center;
+  box-shadow:var(--shadow-sm);
+}
+
+/* ── COLOR SWATCH SELECT ── */
+.color-swatch-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.color-swatch{
+  width:26px;height:26px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.color-swatch.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(184,151,46,0.3);}
+.color-swatch.selected::after{content:'✓';font-size:12px;color:rgba(0,0,0,0.6);}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#FFFDF7 0%,#F5EDD5 50%,#EDE0C0 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 28px;
+}
+.login-logo{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#D4AF55,#F0D080);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#fff;
+  box-shadow:0 6px 24px rgba(184,151,46,0.4);margin-bottom:16px;
+}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#1A1510;text-align:center;line-height:1.1;}
+.login-sub{font-size:12px;color:#8A7A60;text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;margin-top:4px;}
+.login-card{
+  width:100%;max-width:340px;background:#fff;
+  border:1px solid #E8DFC8;border-radius:20px;
+  padding:28px 24px;box-shadow:0 8px 40px rgba(90,70,30,0.14);
+}
+.login-field{margin-bottom:18px;}
+.login-lbl{font-size:10px;color:#8A7A60;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:7px;display:block;}
+.login-input{
+  width:100%;background:#FAF8F4;border:1.5px solid #E8DFC8;
+  border-radius:10px;padding:13px 14px;color:#1A1510;
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;
+}
+.login-input:focus{border-color:#B8972E;box-shadow:0 0 0 3px rgba(184,151,46,0.12);}
+.login-btn{
+  width:100%;background:linear-gradient(135deg,#D4AF55,#B8972E);
+  border:none;border-radius:10px;padding:15px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;letter-spacing:.3px;
+  box-shadow:0 4px 16px rgba(184,151,46,0.35);transition:all .2s;margin-top:4px;
+}
+.login-btn:active{transform:scale(0.97);opacity:.9;}
+.login-error{
+  background:#FDECEA;border:1px solid rgba(192,57,43,0.2);
+  border-radius:8px;padding:10px 14px;color:#C0392B;
+  font-size:13px;font-weight:500;text-align:center;
+  margin-top:14px;display:none;
+}
+.login-footer{font-size:11px;color:#B8A888;text-align:center;margin-top:20px;letter-spacing:.5px;}
+.btn-export{
+  background:linear-gradient(135deg,#2563EB,#1D4ED8);
+  border:none;border-radius:8px;padding:12px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 3px 10px rgba(37,99,235,0.25);transition:all .2s;width:100%;
+}
+.btn-import{
+  background:#fff;border:1.5px solid rgba(37,99,235,0.3);
+  border-radius:8px;padding:12px;
+  color:#2563EB;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .2s;width:100%;
+}
+.btn-logout{
+  width:100%;background:#FDECEA;border:1.5px solid rgba(192,57,43,0.2);
+  border-radius:8px;padding:13px;
+  color:#C0392B;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:10px;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.backup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">RF</div>
+  <div class="login-title">RF Luxe</div>
+  <div class="login-sub">Tables &amp; Chairs Rental</div>
+  <div class="login-card">
+    <div class="login-field">
+      <label class="login-lbl">Username</label>
+      <input class="login-input" id="login-user" type="text" placeholder="Enter username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"/>
+    </div>
+    <div class="login-field" style="margin-bottom:4px;">
+      <label class="login-lbl">Password</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="Enter password" autocomplete="off"/>
+    </div>
+    <div class="login-error" id="login-error">Incorrect username or password.</div>
+    <button class="login-btn" onclick="doLogin()" style="margin-top:18px;">Sign In</button>
+  </div>
+  <div class="login-footer">RF Luxe Business Manager &nbsp;✦&nbsp; v3.0</div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="overlay" id="modal-import">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Import Backup</div>
+      <div class="modal-close" onclick="closeModal('modal-import')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="background:#FEF9EC;border:1px solid rgba(184,151,46,0.2);border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:13px;color:#4A3F2F;font-weight:500;margin-bottom:4px;">⚠️ This will replace ALL existing data</div>
+        <div style="font-size:12px;color:#8A7A60;">Paste your exported backup JSON below. This cannot be undone.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Paste Backup JSON</label>
+        <textarea class="form-ctrl" id="import-json" placeholder="Paste your backup data here..." style="min-height:140px;font-size:12px;font-family:monospace;"></textarea>
+      </div>
+      <button class="btn-primary" onclick="doImport()">📥 Import &amp; Restore</button>
+      <div style="height:8px;"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-import')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-icon">RF</div>
+    <div>
+      <div class="logo-text">RF Luxe</div>
+      <div class="logo-sub">Tables &amp; Chairs Rental</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-date" id="hdrDate"></div>
+    <div class="topbar-time" id="hdrTime"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="screen active" id="screen-dashboard">
+  <div class="page-hdr">
+    <div class="page-title" id="dashTitle">Good morning</div>
+    <div class="page-sub">Here's your business at a glance ✦</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Total Revenue</div><div class="stat-val g" id="ds-income">₱0</div><div class="stat-note" id="ds-sales-ct">0 sales</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total Costs</div><div class="stat-val r" id="ds-costs">₱0</div><div class="stat-note" id="ds-cost-ct">0 entries</div></div>
+    <div class="stat-card"><div class="stat-lbl">Net Profit</div><div class="stat-val gold" id="ds-profit">₱0</div><div class="stat-note">all time</div></div>
+    <div class="stat-card"><div class="stat-lbl">ROI</div><div class="stat-val gold" id="ds-roi">0%</div><div class="stat-note">return on cost</div></div>
+  </div>
+  <div class="card card-gold">
+    <div class="card-title">📈 Monthly Overview <span style="font-size:11px;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:auto;" id="ds-mon-lbl"></span></div>
+    <div class="roi-row"><div class="roi-lbl-row"><span>Income</span><span id="ds-m-inc">₱0</span></div><div class="roi-track"><div class="roi-fill income" id="ds-m-inc-bar" style="width:0%"></div></div></div>
+    <div class="roi-row"><div class="roi-lbl-row"><span>Expenses</span><span id="ds-m-exp">₱0</span></div><div class="roi-track"><div class="roi-fill expense" id="ds-m-exp-bar" style="width:0%"></div></div></div>
+    <div class="roi-row"><div class="roi-lbl-row"><span>Profit</span><span id="ds-m-prof">₱0</span></div><div class="roi-track"><div class="roi-fill profit" id="ds-m-prof-bar" style="width:0%"></div></div></div>
+  </div>
+  <div class="card-title" style="font-size:13px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Upcoming Events</div>
+  <div id="ds-upcoming"></div>
+  <div class="card-title" style="font-size:13px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin:14px 0 8px;">Recent Transactions</div>
+  <div id="ds-recent"></div>
+
+  <!-- BACKUP & ACCOUNT -->
+  <div style="margin-top:20px;">
+    <div class="card-title" style="font-size:13px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">⚙️ Data & Account</div>
+    <div class="card" style="background:linear-gradient(135deg,#F0F9FF,#E0F0FF);border-color:rgba(37,99,235,0.15);">
+      <div style="font-size:13px;font-weight:600;color:#1D4ED8;margin-bottom:4px;">💾 Backup Your Data</div>
+      <div style="font-size:12px;color:#4A3F2F;margin-bottom:12px;">Export all your data as JSON or restore from a previous backup.</div>
+      <div class="backup-grid">
+        <button class="btn-export" onclick="doExport()">📤 Export</button>
+        <button class="btn-import" onclick="openModal('modal-import')">📥 Import</button>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">🔒 Sign Out</button>
+  </div>
+
+</div>
+
+<!-- ══ SALES ══ -->
+<div class="screen" id="screen-sales">
+  <div class="page-hdr"><div class="page-title">Sales Log</div><div class="page-sub">Track all rental income</div></div>
+  <div class="stat-grid">
+    <div class="stat-card wide"><div class="stat-lbl">Total Revenue</div><div class="stat-val g" id="sl-total">₱0</div></div>
+    <div class="stat-card"><div class="stat-lbl">This Month</div><div class="stat-val gold" id="sl-month">₱0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Transactions</div><div class="stat-val" id="sl-count">0</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filterSales('all',this)">All</button>
+    <button class="tab" onclick="filterSales('paid',this)">Paid</button>
+    <button class="tab" onclick="filterSales('pending',this)">Pending</button>
+    <button class="tab" onclick="filterSales('partial',this)">Partial</button>
+  </div>
+  <div id="sales-list"></div>
+</div>
+
+<!-- ══ CALENDAR ══ -->
+<div class="screen" id="screen-calendar">
+  <div class="page-hdr"><div class="page-title">Calendar</div><div class="page-sub">Bookings & event schedule</div></div>
+  <div class="cal-wrap">
+    <div class="cal-nav">
+      <div class="cal-arr" onclick="changeMonth(-1)">‹</div>
+      <div class="cal-mnth" id="calTitle"></div>
+      <div class="cal-arr" onclick="changeMonth(1)">›</div>
+    </div>
+    <div class="cal-grid7">
+      <div class="cal-dh">SUN</div><div class="cal-dh">MON</div><div class="cal-dh">TUE</div>
+      <div class="cal-dh">WED</div><div class="cal-dh">THU</div><div class="cal-dh">FRI</div><div class="cal-dh">SAT</div>
+    </div>
+    <div class="cal-grid7" id="calDays"></div>
+  </div>
+  <div id="calSelLabel" style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:600;"></div>
+  <div id="calEvents"></div>
+</div>
+
+<!-- ══ BOOKINGS ══ -->
+<div class="screen" id="screen-bookings">
+  <div class="page-hdr"><div class="page-title">Bookings</div><div class="page-sub">Event & rental tracker</div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val" id="bk-total">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Upcoming</div><div class="stat-val gold" id="bk-upcoming">0</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filterBookings('all',this)">All</button>
+    <button class="tab" onclick="filterBookings('confirmed',this)">Confirmed</button>
+    <button class="tab" onclick="filterBookings('pending',this)">Pending</button>
+    <button class="tab" onclick="filterBookings('cancelled',this)">Cancelled</button>
+  </div>
+  <div id="bookings-list"></div>
+</div>
+
+<!-- ══ INVENTORY ══ -->
+<div class="screen" id="screen-inventory">
+  <div class="page-hdr"><div class="page-title">Inventory</div><div class="page-sub">Stock & release management</div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Total Stock</div><div class="stat-val" id="iv-total">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Currently Out</div><div class="stat-val r" id="iv-out">0</div></div>
+  </div>
+  <div id="inventory-list"></div>
+  <div class="sec-div">Release Log</div>
+  <button class="btn-icon" style="width:100%;justify-content:center;margin-bottom:12px;" onclick="openModal('modal-release')">📦 Record Release / Return</button>
+  <div id="release-list"></div>
+</div>
+
+<!-- ══ FINANCE ══ -->
+<div class="screen" id="screen-finance">
+  <div class="page-hdr"><div class="page-title">Finance</div><div class="page-sub">ROI, costs & profit analysis</div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Total Income</div><div class="stat-val g" id="fn-income">₱0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total Costs</div><div class="stat-val r" id="fn-costs">₱0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Net Profit</div><div class="stat-val gold" id="fn-profit">₱0</div></div>
+    <div class="stat-card"><div class="stat-lbl">ROI</div><div class="stat-val gold" id="fn-roi">0%</div></div>
+  </div>
+  <div class="card card-gold">
+    <div class="card-title">Profit Margin</div>
+    <div class="prog-wrap" style="height:12px;margin-bottom:8px;"><div class="prog-fill" id="fn-margin-bar" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);">
+      <span>0%</span><span id="fn-margin-pct" style="font-weight:600;color:var(--gold);">0% margin</span><span>100%</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filterFinance('all',this)">All</button>
+    <button class="tab" onclick="filterFinance('income',this)">Income</button>
+    <button class="tab" onclick="filterFinance('expense',this)">Expenses</button>
+  </div>
+  <div id="finance-list"></div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- FABs -->
+<button class="fab" id="fab-sale" onclick="openModal('modal-sale')" style="display:none;">+</button>
+<button class="fab" id="fab-booking" onclick="openModal('modal-booking')">+</button>
+<button class="fab" id="fab-inventory" onclick="openModal('modal-inventory')" style="display:none;">+</button>
+<button class="fab" id="fab-finance" onclick="openModal('modal-finance')" style="display:none;">+</button>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchScreen('dashboard',this,'')">
+    <span class="nav-icon">◈</span>Home
+  </button>
+  <button class="nav-btn" onclick="switchScreen('sales',this,'fab-sale')">
+    <span class="nav-icon">₱</span>Sales
+  </button>
+  <button class="nav-btn" onclick="switchScreen('calendar',this,'')">
+    <span class="nav-icon">📅</span>Calendar
+  </button>
+  <button class="nav-btn" onclick="switchScreen('bookings',this,'fab-booking')">
+    <span class="nav-icon">📋</span>Bookings
+  </button>
+  <button class="nav-btn" onclick="switchScreen('inventory',this,'fab-inventory')">
+    <span class="nav-icon">📦</span>Stock
+  </button>
+  <button class="nav-btn" onclick="switchScreen('finance',this,'fab-finance')">
+    <span class="nav-icon">📊</span>Finance
+  </button>
+</nav>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- SALE MODAL -->
+<div class="overlay" id="modal-sale">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Log New Sale</div>
+      <div class="modal-close" onclick="closeModal('modal-sale')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-lbl">Client Name *</label><input class="form-ctrl" id="s-client" placeholder="e.g. Maria Santos"/></div>
+      <div class="form-group"><label class="form-lbl">Event Type</label><input class="form-ctrl" id="s-event" placeholder="Wedding, Birthday, Debut..."/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Amount (₱) *</label><input class="form-ctrl" id="s-amount" type="number" placeholder="0.00"/></div>
+        <div class="form-group"><label class="form-lbl">Date</label><input class="form-ctrl" id="s-date" type="date"/></div>
+      </div>
+      <div class="form-group"><label class="form-lbl">Payment Status</label>
+        <select class="form-ctrl" id="s-status">
+          <option value="paid">Fully Paid</option>
+          <option value="partial">Partial Payment</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-lbl">Notes</label><textarea class="form-ctrl" id="s-notes" placeholder="Optional notes..."></textarea></div>
+      <button class="btn-primary" onclick="saveSale()">Save Sale</button>
+      <div style="height:8px"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-sale')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL (ADD / EDIT) -->
+<div class="overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title" id="bk-modal-title">New Booking</div>
+      <div class="modal-close" onclick="closeModal('modal-booking')">✕</div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="b-edit-id"/>
+      <div class="form-group"><label class="form-lbl">Client Name *</label><input class="form-ctrl" id="b-client" placeholder="Client name"/></div>
+      <div class="form-group"><label class="form-lbl">Event Type</label><input class="form-ctrl" id="b-event" placeholder="Wedding, Corporate, Birthday..."/></div>
+      <div class="form-group"><label class="form-lbl">Venue</label><input class="form-ctrl" id="b-venue" placeholder="Event venue or location"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Event Date</label><input class="form-ctrl" id="b-date" type="date"/></div>
+        <div class="form-group"><label class="form-lbl">Time</label><input class="form-ctrl" id="b-time" type="time"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Tables Needed</label><input class="form-ctrl" id="b-tables" type="number" placeholder="0"/></div>
+        <div class="form-group"><label class="form-lbl">Chairs Needed</label><input class="form-ctrl" id="b-chairs" type="number" placeholder="0"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Amount (₱)</label><input class="form-ctrl" id="b-amount" type="number" placeholder="0.00"/></div>
+        <div class="form-group"><label class="form-lbl">Status</label>
+          <select class="form-ctrl" id="b-status">
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ADD-ONS SECTION -->
+      <div class="addons-section">
+        <div class="addons-title">✨ Add-Ons & Linens</div>
+        <div id="addons-container"></div>
+        <button class="btn-add-addon" onclick="addAddonRow()">＋ Add Item</button>
+      </div>
+
+      <div class="form-group"><label class="form-lbl">Notes</label><textarea class="form-ctrl" id="b-notes" placeholder="Delivery time, setup, contacts..."></textarea></div>
+      <button class="btn-primary" onclick="saveBooking()">Save Booking</button>
+      <div style="height:8px"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-booking')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW BOOKING MODAL -->
+<div class="overlay" id="modal-view-booking">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Booking Details</div>
+      <div class="modal-close" onclick="closeModal('modal-view-booking')">✕</div>
+    </div>
+    <div class="modal-body" id="view-booking-body"></div>
+  </div>
+</div>
+
+<!-- INVENTORY MODAL -->
+<div class="overlay" id="modal-inventory">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Add Inventory Item</div>
+      <div class="modal-close" onclick="closeModal('modal-inventory')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-lbl">Item Name *</label><input class="form-ctrl" id="i-name" placeholder="e.g. Round Tables 60in, Tiffany Chairs..."/></div>
+      <div class="form-group"><label class="form-lbl">Category</label>
+        <select class="form-ctrl" id="i-category">
+          <option value="tables">Tables</option><option value="chairs">Chairs</option>
+          <option value="linens">Linens</option><option value="decor">Decor</option>
+          <option value="equipment">Equipment</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Total Stock</label><input class="form-ctrl" id="i-total" type="number" placeholder="0"/></div>
+        <div class="form-group"><label class="form-lbl">Unit Cost (₱)</label><input class="form-ctrl" id="i-cost" type="number" placeholder="0.00"/></div>
+      </div>
+      <div class="form-group"><label class="form-lbl">Notes</label><input class="form-ctrl" id="i-notes" placeholder="Condition, color, location..."/></div>
+      <button class="btn-primary" onclick="saveInventory()">Add Item</button>
+      <div style="height:8px"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-inventory')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RELEASE MODAL -->
+<div class="overlay" id="modal-release">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Release / Return</div>
+      <div class="modal-close" onclick="closeModal('modal-release')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-lbl">Action</label>
+        <select class="form-ctrl" id="r-action">
+          <option value="release">Release (Out)</option>
+          <option value="return">Return (In)</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-lbl">Item</label><select class="form-ctrl" id="r-item"></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Quantity</label><input class="form-ctrl" id="r-qty" type="number" placeholder="0"/></div>
+        <div class="form-group"><label class="form-lbl">Date</label><input class="form-ctrl" id="r-date" type="date"/></div>
+      </div>
+      <div class="form-group"><label class="form-lbl">Client / Event *</label><input class="form-ctrl" id="r-client" placeholder="Who received the items?"/></div>
+      <div class="form-group"><label class="form-lbl">Notes</label><input class="form-ctrl" id="r-notes" placeholder="Condition on release/return"/></div>
+      <button class="btn-primary" onclick="saveRelease()">Record</button>
+      <div style="height:8px"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-release')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE MODAL -->
+<div class="overlay" id="modal-finance">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Add Transaction</div>
+      <div class="modal-close" onclick="closeModal('modal-finance')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Type</label>
+          <select class="form-ctrl" id="f-type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-lbl">Category</label>
+          <select class="form-ctrl" id="f-category">
+            <option value="rental">Rental Payment</option><option value="deposit">Deposit</option>
+            <option value="transport">Transport/Delivery</option><option value="maintenance">Maintenance</option>
+            <option value="labor">Labor/Staff</option><option value="supplies">Supplies</option>
+            <option value="utilities">Utilities</option><option value="marketing">Marketing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-lbl">Description *</label><input class="form-ctrl" id="f-desc" placeholder="What is this for?"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-lbl">Amount (₱) *</label><input class="form-ctrl" id="f-amount" type="number" placeholder="0.00"/></div>
+        <div class="form-group"><label class="form-lbl">Date</label><input class="form-ctrl" id="f-date" type="date"/></div>
+      </div>
+      <div class="form-group"><label class="form-lbl">Notes</label><textarea class="form-ctrl" id="f-notes" placeholder="Receipt #, reference..."></textarea></div>
+      <button class="btn-primary" onclick="saveFinance()">Save Transaction</button>
+      <div style="height:8px"></div>
+      <button class="btn-secondary" onclick="closeModal('modal-finance')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATABASE
+// ═══════════════════════════════════════
+const DB={
+  get:k=>JSON.parse(localStorage.getItem('rfluxe_'+k)||'[]'),
+  set:(k,v)=>localStorage.setItem('rfluxe_'+k,JSON.stringify(v)),
+  push:(k,v)=>{const d=DB.get(k);d.push(v);DB.set(k,d);return v;}
+};
+
+// ═══════════════════════════════════════
+// ADD-ONS CONFIG
+// ═══════════════════════════════════════
+const ADDON_ITEMS = [
+  { key:'round-table-cover',   label:'Round Table Cover',  colors:['White'] },
+  { key:'long-table-cover',    label:'Long Table Cover',   colors:['White'] },
+  { key:'chair-cover',         label:'Chair Cover',        colors:['White'] },
+  { key:'runner',              label:'Runner',             colors:['Fuchsia Pink','Royal Blue','Gold/Yellow'] },
+  { key:'topper',              label:'Topper',             colors:['Fuchsia Pink','Royal Blue','Gold/Yellow'] },
+  { key:'chair-ribbon',        label:'Chair Ribbon',       colors:['Fuchsia Pink','Royal Blue','Gold/Yellow'] },
+];
+
+const COLOR_HEX = {
+  'White':'#FFFFFF',
+  'Fuchsia Pink':'#E91E8C',
+  'Royal Blue':'#2563EB',
+  'Gold/Yellow':'#D4AF37',
+};
+
+function getColorDot(colorName){
+  if(!colorName||colorName==='——') return `<span style="font-size:13px;color:var(--text4);">—</span>`;
+  const hex=COLOR_HEX[colorName]||'#ccc';
+  const border=colorName==='White'?'#ccc':'transparent';
+  return `<span class="color-dot" style="background:${hex};border-color:${border}"></span>`;
+}
+
+// ═══════════════════════════════════════
+// ADDON ROWS IN FORM
+// ═══════════════════════════════════════
+let addonRows=[];
+
+function buildColorOptions(cfg, selectedColor){
+  const noneOpt=`<option value="——" ${(!selectedColor||selectedColor==='——')?'selected':''}>——</option>`;
+  const colorOpts=cfg.colors.map(c=>`<option value="${c}" ${c===selectedColor?'selected':''}>${c}</option>`).join('');
+  return noneOpt+colorOpts;
+}
+
+function addAddonRow(existing=null){
+  const id='ar_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const item = existing || { id, key:'round-table-cover', qty:1, color:'——' };
+  if(!existing) item.id=id;
+  addonRows.push(item.id);
+
+  const cfg=ADDON_ITEMS.find(a=>a.key===item.key)||ADDON_ITEMS[0];
+  const colorOpts=buildColorOptions(cfg, item.color||'——');
+  const swatchColor=item.color||'——';
+
+  const html=`<div class="addon-row" id="addon-row-${item.id}">
+    <div class="addon-controls">
+      <select class="addon-select" id="addon-item-${item.id}" onchange="onAddonItemChange('${item.id}')">
+        ${ADDON_ITEMS.map(a=>`<option value="${a.key}" ${a.key===item.key?'selected':''}>${a.label}</option>`).join('')}
+      </select>
+      <input class="addon-qty" type="number" id="addon-qty-${item.id}" value="${item.qty||1}" min="1" placeholder="Qty"/>
+      <button class="btn-remove-addon" onclick="removeAddonRow('${item.id}')">✕</button>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Color:</span>
+      <select class="addon-select" id="addon-color-${item.id}" style="flex:1;" onchange="onAddonColorChange('${item.id}')">
+        ${colorOpts}
+      </select>
+      <span id="addon-swatch-${item.id}">${getColorDot(swatchColor)}</span>
+    </div>
+  </div>`;
+
+  const container=document.getElementById('addons-container');
+  const div=document.createElement('div');
+  div.innerHTML=html;
+  container.appendChild(div.firstElementChild);
+}
+
+function onAddonItemChange(id){
+  const keyEl=document.getElementById(`addon-item-${id}`);
+  const key=keyEl.value;
+  const cfg=ADDON_ITEMS.find(a=>a.key===key);
+  const colorSel=document.getElementById(`addon-color-${id}`);
+  colorSel.innerHTML=buildColorOptions(cfg,'——');
+  document.getElementById(`addon-swatch-${id}`).innerHTML=getColorDot('——');
+}
+
+function onAddonColorChange(id){
+  const color=document.getElementById(`addon-color-${id}`).value;
+  document.getElementById(`addon-swatch-${id}`).innerHTML=getColorDot(color);
+}
+
+function removeAddonRow(id){
+  const el=document.getElementById(`addon-row-${id}`);
+  if(el) el.remove();
+  addonRows=addonRows.filter(r=>r!==id);
+}
+
+function clearAddonRows(){
+  document.getElementById('addons-container').innerHTML='';
+  addonRows=[];
+}
+
+function collectAddons(){
+  const addons=[];
+  document.querySelectorAll('[id^="addon-row-"]').forEach(row=>{
+    const id=row.id.replace('addon-row-','');
+    const keyEl=document.getElementById(`addon-item-${id}`);
+    const qtyEl=document.getElementById(`addon-qty-${id}`);
+    const colorEl=document.getElementById(`addon-color-${id}`);
+    if(keyEl&&qtyEl&&colorEl){
+      const cfg=ADDON_ITEMS.find(a=>a.key===keyEl.value);
+      addons.push({
+        key:keyEl.value,
+        label:cfg?cfg.label:keyEl.value,
+        qty:parseInt(qtyEl.value)||1,
+        color:colorEl.value
+      });
+    }
+  });
+  return addons;
+}
+
+function loadAddonsIntoForm(addons=[]){
+  clearAddonRows();
+  addons.forEach(a=>addAddonRow(a));
+}
+
+function renderAddonChips(addons){
+  if(!addons||!addons.length) return '';
+  return `<div class="addon-chips">${addons.map(a=>`
+    <span class="addon-chip">
+      ${getColorDot(a.color)}${a.qty}× ${a.label}${(a.color&&a.color!=='——')?' <span style="opacity:.6;">('+a.color+')</span>':''}
+    </span>`).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+const fmt=n=>'₱'+(+n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});};
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function clearForm(ids){ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+let activeFab='';
+function switchScreen(name,btn,fabId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.fab').forEach(f=>f.style.display='none');
+  document.getElementById('screen-'+name).classList.add('active');
+  btn.classList.add('active');
+  activeFab=fabId;
+  if(fabId) document.getElementById(fabId).style.display='flex';
+  renderAll();
+  if(name==='calendar') renderCalendar();
+}
+
+// ═══════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════
+function openModal(id){
+  if(id==='modal-release') populateReleaseItems();
+  if(id==='modal-booking'){
+    const editId=document.getElementById('b-edit-id').value;
+    if(!editId){
+      clearAddonRows();
+      document.getElementById('bk-modal-title').textContent='New Booking';
+    }
+    ['b-date','r-date','f-date','s-date'].forEach(fid=>{const e=document.getElementById(fid);if(e&&!e.value)e.value=today();});
+  }
+  ['s-date','r-date','f-date'].forEach(fid=>{const e=document.getElementById(fid);if(e&&!e.value)e.value=today();});
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  if(id==='modal-booking'){
+    document.getElementById('b-edit-id').value='';
+    document.getElementById('bk-modal-title').textContent='New Booking';
+    clearAddonRows();
+  }
+}
+document.querySelectorAll('.overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ═══════════════════════════════════════
+// SALES
+// ═══════════════════════════════════════
+let salesFilter='all';
+function saveSale(){
+  const client=document.getElementById('s-client').value.trim();
+  const amount=parseFloat(document.getElementById('s-amount').value)||0;
+  if(!client||!amount){toast('Please fill client name and amount');return;}
+  const sale={id:uid(),client,event:document.getElementById('s-event').value,amount,date:document.getElementById('s-date').value,status:document.getElementById('s-status').value,notes:document.getElementById('s-notes').value};
+  DB.push('sales',sale);
+  DB.push('finance',{id:uid(),type:'income',category:'rental',desc:'Sale: '+client,amount,date:sale.date,notes:''});
+  clearForm(['s-client','s-event','s-amount','s-notes']);
+  document.getElementById('s-status').value='paid';
+  closeModal('modal-sale');
+  toast('✦ Sale logged successfully!');
+  renderAll();
+}
+function filterSales(f,btn){
+  salesFilter=f;
+  document.querySelectorAll('#screen-sales .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderSales();
+}
+function renderSales(){
+  const all=DB.get('sales');
+  const list=all.filter(s=>salesFilter==='all'||s.status===salesFilter).reverse();
+  const total=all.reduce((s,x)=>s+x.amount,0);
+  const now=new Date();const mon=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const mTotal=all.filter(s=>s.date&&s.date.startsWith(mon)).reduce((s,x)=>s+x.amount,0);
+  document.getElementById('sl-total').textContent=fmt(total);
+  document.getElementById('sl-month').textContent=fmt(mTotal);
+  document.getElementById('sl-count').textContent=all.length;
+  const el=document.getElementById('sales-list');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">₱</div><div class="empty-txt">No sales yet. Tap + to log your first sale.</div></div>`;return;}
+  el.innerHTML=list.map(s=>`
+    <div class="list-item">
+      <div class="li-info">
+        <div class="li-title">${s.client}</div>
+        <div class="li-sub">${s.event||'Rental'} · ${fmtDate(s.date)}</div>
+        ${s.notes?`<div class="li-sub" style="font-style:italic;">${s.notes}</div>`:''}
+      </div>
+      <div class="li-right">
+        <div class="amt-pos">${fmt(s.amount)}</div>
+        <span class="badge ${s.status==='paid'?'bg':s.status==='partial'?'bgold':'br'}">${s.status}</span>
+        <br><button class="btn-del" onclick="delSale('${s.id}')" style="margin-top:5px;">Delete</button>
+      </div>
+    </div>`).join('');
+}
+function delSale(id){if(!confirm('Delete this sale?'))return;DB.set('sales',DB.get('sales').filter(s=>s.id!==id));renderAll();toast('Sale deleted');}
+
+// ═══════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════
+let calDate=new Date();let calSel=today();
+function changeMonth(d){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+d,1);renderCalendar();}
+function renderCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  document.getElementById('calTitle').textContent=new Date(y,m,1).toLocaleDateString('en-PH',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
+  const bookings=DB.get('bookings');const eventDates=new Set(bookings.map(b=>b.date));
+  const td=today();let html='';
+  for(let i=0;i<first;i++){const pd=new Date(y,m,-(first-i-1));html+=`<div class="cal-d other">${pd.getDate()}</div>`;}
+  for(let d=1;d<=days;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cls=['cal-d',ds===td?'today':'',ds===calSel?'sel':'',eventDates.has(ds)?'has-ev':''].filter(Boolean).join(' ');
+    html+=`<div class="${cls}" onclick="selDay('${ds}')">${d}</div>`;
+  }
+  document.getElementById('calDays').innerHTML=html;
+  renderDayEvents();
+}
+function selDay(ds){calSel=ds;renderCalendar();}
+function renderDayEvents(){
+  const bks=DB.get('bookings').filter(b=>b.date===calSel);
+  document.getElementById('calSelLabel').textContent=`Events on ${fmtDate(calSel)}`;
+  const el=document.getElementById('calEvents');
+  if(!bks.length){el.innerHTML=`<div style="color:var(--text4);font-size:13px;padding:10px 0;">No events on this day</div>`;return;}
+  el.innerHTML=bks.map(b=>buildBookingCard(b)).join('');
+}
+
+// ═══════════════════════════════════════
+// BOOKINGS
+// ═══════════════════════════════════════
+let bookFilter='all';
+
+function saveBooking(){
+  const client=document.getElementById('b-client').value.trim();
+  if(!client){toast('Please enter client name');return;}
+  const editId=document.getElementById('b-edit-id').value;
+  const addons=collectAddons();
+  const data={
+    id:editId||uid(),client,event:document.getElementById('b-event').value,
+    venue:document.getElementById('b-venue').value,date:document.getElementById('b-date').value,
+    time:document.getElementById('b-time').value,tables:parseInt(document.getElementById('b-tables').value)||0,
+    chairs:parseInt(document.getElementById('b-chairs').value)||0,
+    amount:parseFloat(document.getElementById('b-amount').value)||0,
+    status:document.getElementById('b-status').value,
+    notes:document.getElementById('b-notes').value,addons
+  };
+  if(editId){
+    const all=DB.get('bookings');
+    const idx=all.findIndex(b=>b.id===editId);
+    if(idx>-1) all[idx]=data;
+    DB.set('bookings',all);
+    toast('✦ Booking updated!');
+  } else {
+    DB.push('bookings',data);
+    toast('✦ Booking saved!');
+  }
+  clearForm(['b-client','b-event','b-venue','b-date','b-time','b-tables','b-chairs','b-amount','b-notes']);
+  document.getElementById('b-edit-id').value='';
+  clearAddonRows();
+  closeModal('modal-booking');
+  renderAll();renderCalendar();
+}
+
+function editBooking(id){
+  const b=DB.get('bookings').find(b=>b.id===id);
+  if(!b) return;
+  document.getElementById('b-edit-id').value=b.id;
+  document.getElementById('bk-modal-title').textContent='Edit Booking';
+  document.getElementById('b-client').value=b.client||'';
+  document.getElementById('b-event').value=b.event||'';
+  document.getElementById('b-venue').value=b.venue||'';
+  document.getElementById('b-date').value=b.date||'';
+  document.getElementById('b-time').value=b.time||'';
+  document.getElementById('b-tables').value=b.tables||0;
+  document.getElementById('b-chairs').value=b.chairs||0;
+  document.getElementById('b-amount').value=b.amount||0;
+  document.getElementById('b-status').value=b.status||'confirmed';
+  document.getElementById('b-notes').value=b.notes||'';
+  loadAddonsIntoForm(b.addons||[]);
+  closeModal('modal-view-booking');
+  openModal('modal-booking');
+}
+
+function viewBooking(id){
+  const b=DB.get('bookings').find(b=>b.id===id);
+  if(!b) return;
+  const statusCls=b.status==='confirmed'?'bg':b.status==='pending'?'bgold':'br';
+  const html=`
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--text);">${b.client}</div>
+        <span class="badge ${statusCls}">${b.status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text3);">${b.event||'Event'}</div>
+    </div>
+    <div style="background:var(--off-white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;">
+      <div class="booking-card-row">📅 <span><strong>${fmtDate(b.date)}</strong>${b.time?' at '+b.time:''}</span></div>
+      ${b.venue?`<div class="booking-card-row">📍 <span>${b.venue}</span></div>`:''}
+      <div class="booking-card-row">🪵 <span>${b.tables||0} Tables &nbsp;·&nbsp; 🪑 ${b.chairs||0} Chairs</span></div>
+      <div class="booking-card-row">💰 <span style="font-weight:700;color:var(--gold);">${fmt(b.amount)}</span></div>
+      ${b.notes?`<div class="booking-card-row">📝 <span style="color:var(--text3);font-style:italic;">${b.notes}</span></div>`:''}
+    </div>
+    ${b.addons&&b.addons.length?`
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">✨ Add-Ons & Linens</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${b.addons.map(a=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#FEF9EC,#FDF3D0);border:1px solid rgba(184,151,46,0.2);border-radius:10px;padding:10px 12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${getColorDot(a.color)}
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text);">${a.label}</div>
+                <div style="font-size:11px;color:var(--text3);">${(a.color&&a.color!=='——')?a.color:'No color specified'}</div>
+              </div>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);">×${a.qty}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:''}
+    <div style="display:flex;gap:8px;">
+      <button class="btn-primary" style="flex:1;" onclick="editBooking('${b.id}')">✏️ Edit</button>
+      <button class="btn-secondary" style="flex:1;" onclick="delBooking('${b.id}')">🗑 Delete</button>
+    </div>`;
+  document.getElementById('view-booking-body').innerHTML=html;
+  openModal('modal-view-booking');
+}
+
+function buildBookingCard(b){
+  const statusCls=b.status==='confirmed'?'bg':b.status==='pending'?'bgold':'br';
+  return `<div class="booking-card">
+    <div class="booking-card-hdr">
+      <div>
+        <div class="li-title">${b.client}</div>
+        <div class="li-sub">${b.event||'Event'} · ${fmtDate(b.date)}${b.time?' at '+b.time:''}</div>
+        ${b.venue?`<div class="li-sub">📍 ${b.venue}</div>`:''}
+      </div>
+      <div style="text-align:right;">
+        <div class="amt-gold">${fmt(b.amount)}</div>
+        <span class="badge ${statusCls}" style="margin-top:4px;display:inline-flex;">${b.status}</span>
+      </div>
+    </div>
+    <div class="booking-card-body">
+      <div style="display:flex;gap:10px;font-size:12px;color:var(--text3);margin-bottom:6px;">
+        <span>🪵 ${b.tables||0} tables</span>
+        <span>🪑 ${b.chairs||0} chairs</span>
+      </div>
+      ${b.addons&&b.addons.length?renderAddonChips(b.addons):'<span style="font-size:11px;color:var(--text4);">No add-ons</span>'}
+    </div>
+    <div class="booking-card-ftr">
+      <span style="font-size:11px;color:var(--text4);">${b.addons?b.addons.length:0} add-on type${(b.addons&&b.addons.length===1)?'':'s'}</span>
+      <div class="booking-actions">
+        <button class="btn-edit" onclick="editBooking('${b.id}')">✏️ Edit</button>
+        <button class="btn-icon" onclick="viewBooking('${b.id}')" style="padding:5px 12px;font-size:12px;">View</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function filterBookings(f,btn){
+  bookFilter=f;
+  document.querySelectorAll('#screen-bookings .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderBookings();
+}
+function renderBookings(){
+  const all=DB.get('bookings');
+  const td=today();
+  const upcoming=all.filter(b=>b.date>=td&&b.status!=='cancelled').length;
+  document.getElementById('bk-total').textContent=all.length;
+  document.getElementById('bk-upcoming').textContent=upcoming;
+  const list=all.filter(b=>bookFilter==='all'||b.status===bookFilter).sort((a,b)=>a.date<b.date?-1:1);
+  const el=document.getElementById('bookings-list');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">No bookings yet. Tap + to add one.</div></div>`;return;}
+  el.innerHTML=list.map(b=>buildBookingCard(b)).join('');
+}
+function delBooking(id){
+  if(!confirm('Delete this booking?'))return;
+  DB.set('bookings',DB.get('bookings').filter(b=>b.id!==id));
+  closeModal('modal-view-booking');
+  renderAll();renderCalendar();toast('Booking deleted');
+}
+
+// ═══════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════
+function saveInventory(){
+  const name=document.getElementById('i-name').value.trim();
+  if(!name){toast('Please enter item name');return;}
+  DB.push('inventory',{id:uid(),name,category:document.getElementById('i-category').value,total:parseInt(document.getElementById('i-total').value)||0,released:0,cost:parseFloat(document.getElementById('i-cost').value)||0,notes:document.getElementById('i-notes').value});
+  clearForm(['i-name','i-total','i-cost','i-notes']);
+  closeModal('modal-inventory');toast('✦ Item added!');renderAll();
+}
+function populateReleaseItems(){
+  const inv=DB.get('inventory');
+  const sel=document.getElementById('r-item');
+  sel.innerHTML=inv.length?inv.map(i=>`<option value="${i.id}">${i.name} (Avail: ${i.total-i.released})</option>`).join(''):'<option>No items yet</option>';
+}
+function saveRelease(){
+  const action=document.getElementById('r-action').value;
+  const itemId=document.getElementById('r-item').value;
+  const qty=parseInt(document.getElementById('r-qty').value)||0;
+  const client=document.getElementById('r-client').value.trim();
+  if(!qty||!client){toast('Fill in quantity and client');return;}
+  const inv=DB.get('inventory');const item=inv.find(i=>i.id===itemId);
+  if(!item){toast('Item not found');return;}
+  if(action==='release'){const avail=item.total-item.released;if(qty>avail){toast(`Only ${avail} available`);return;}item.released+=qty;}
+  else{item.released=Math.max(0,item.released-qty);}
+  DB.set('inventory',inv);
+  DB.push('releases',{id:uid(),itemId,itemName:item.name,action,qty,date:document.getElementById('r-date').value,client,notes:document.getElementById('r-notes').value});
+  clearForm(['r-qty','r-client','r-notes']);
+  closeModal('modal-release');toast(`✦ ${action==='release'?'Released':'Returned'} ${qty}× ${item.name}`);renderAll();
+}
+function renderInventory(){
+  const inv=DB.get('inventory');
+  const totalItems=inv.reduce((s,i)=>s+i.total,0);
+  const totalOut=inv.reduce((s,i)=>s+i.released,0);
+  document.getElementById('iv-total').textContent=totalItems;
+  document.getElementById('iv-out').textContent=totalOut;
+  const el=document.getElementById('inventory-list');
+  if(!inv.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📦</div><div class="empty-txt">No inventory items. Tap + to add.</div></div>`;return;}
+  el.innerHTML=inv.map(i=>{
+    const avail=i.total-i.released;const pct=i.total?(i.released/i.total)*100:0;
+    const barColor=pct>80?'var(--red)':pct>50?'var(--gold)':'var(--green)';
+    return `<div class="inv-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:600;font-size:15px;color:var(--text);">${i.name}</div>
+        <span class="badge ${avail>0?'bg':'br'}">${i.category}</span>
+      </div>
+      <div class="inv-nums">
+        <div class="inv-num-box"><div class="inv-num-val">${i.total}</div><div class="inv-num-lbl">Total</div></div>
+        <div class="inv-num-box"><div class="inv-num-val out">${i.released}</div><div class="inv-num-lbl">Out</div></div>
+        <div class="inv-num-box"><div class="inv-num-val avail">${avail}</div><div class="inv-num-lbl">Available</div></div>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${pct.toFixed(0)}%;background:${barColor};"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--text4);">
+        <span>${pct.toFixed(0)}% deployed</span>
+        <span>Cost: ${fmt(i.cost)}/unit</span>
+        <button class="btn-del" onclick="delInventory('${i.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  const releases=DB.get('releases').reverse().slice(0,10);
+  const rl=document.getElementById('release-list');
+  if(!releases.length){rl.innerHTML=`<div style="color:var(--text4);font-size:13px;padding:8px 0;">No release records yet.</div>`;return;}
+  rl.innerHTML=releases.map(r=>`
+    <div class="release-item">
+      <div><div style="font-weight:600;font-size:13px;">${r.itemName}</div><div style="font-size:11px;color:var(--text3);">${r.client} · ${fmtDate(r.date)}</div></div>
+      <div style="text-align:right;">
+        <div class="${r.action==='release'?'amt-neg':'amt-pos'}">${r.action==='release'?'▼':'▲'} ${r.qty}</div>
+        <span class="badge ${r.action==='release'?'br':'bg'}">${r.action}</span>
+      </div>
+    </div>`).join('');
+}
+function delInventory(id){if(!confirm('Delete item?'))return;DB.set('inventory',DB.get('inventory').filter(i=>i.id!==id));renderAll();toast('Item deleted');}
+
+// ═══════════════════════════════════════
+// FINANCE
+// ═══════════════════════════════════════
+let finFilter='all';
+function saveFinance(){
+  const desc=document.getElementById('f-desc').value.trim();
+  const amount=parseFloat(document.getElementById('f-amount').value)||0;
+  if(!desc||!amount){toast('Fill in description and amount');return;}
+  DB.push('finance',{id:uid(),type:document.getElementById('f-type').value,category:document.getElementById('f-category').value,desc,amount,date:document.getElementById('f-date').value,notes:document.getElementById('f-notes').value});
+  clearForm(['f-desc','f-amount','f-notes']);
+  closeModal('modal-finance');toast('✦ Transaction saved!');renderAll();
+}
+function filterFinance(f,btn){
+  finFilter=f;
+  document.querySelectorAll('#screen-finance .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderFinance();
+}
+function renderFinance(){
+  const all=DB.get('finance');
+  const income=all.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const costs=all.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const profit=income-costs;const roi=costs>0?((profit/costs)*100):0;const margin=income>0?((profit/income)*100):0;
+  document.getElementById('fn-income').textContent=fmt(income);
+  document.getElementById('fn-costs').textContent=fmt(costs);
+  const pp=document.getElementById('fn-profit');pp.textContent=fmt(profit);pp.className='stat-val '+(profit>=0?'g':'r');
+  const rp=document.getElementById('fn-roi');rp.textContent=roi.toFixed(1)+'%';rp.className='stat-val '+(roi>=0?'gold':'r');
+  document.getElementById('fn-margin-bar').style.width=Math.max(0,Math.min(100,margin)).toFixed(0)+'%';
+  document.getElementById('fn-margin-pct').textContent=margin.toFixed(1)+'% margin';
+  const list=all.filter(t=>finFilter==='all'||t.type===finFilter).reverse();
+  const el=document.getElementById('finance-list');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📊</div><div class="empty-txt">No transactions yet.</div></div>`;return;}
+  el.innerHTML=list.map(t=>`
+    <div class="list-item">
+      <div class="li-info">
+        <div class="li-title">${t.desc}</div>
+        <div class="li-sub">${t.category} · ${fmtDate(t.date)}</div>
+        ${t.notes?`<div class="li-sub" style="font-style:italic;">${t.notes}</div>`:''}
+      </div>
+      <div class="li-right">
+        <div class="${t.type==='income'?'amt-pos':'amt-neg'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+        <span class="badge ${t.type==='income'?'bg':'br'}">${t.type}</span>
+        <br><button class="btn-del" onclick="delFinance('${t.id}')" style="margin-top:5px;">Delete</button>
+      </div>
+    </div>`).join('');
+}
+function delFinance(id){if(!confirm('Delete?'))return;DB.set('finance',DB.get('finance').filter(t=>t.id!==id));renderAll();toast('Deleted');}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard(){
+  const now=new Date();const h=now.getHours();
+  document.getElementById('dashTitle').textContent=h<12?'Good morning ☀️':h<18?'Good afternoon 🌤':' Good evening 🌙';
+  const fin=DB.get('finance');const sales=DB.get('sales');const bookings=DB.get('bookings');
+  const income=fin.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const costs=fin.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const profit=income-costs;const roi=costs>0?((profit/costs)*100):0;
+  document.getElementById('ds-income').textContent=fmt(income);
+  document.getElementById('ds-sales-ct').textContent=sales.length+' sales';
+  document.getElementById('ds-costs').textContent=fmt(costs);
+  document.getElementById('ds-cost-ct').textContent=fin.filter(t=>t.type==='expense').length+' entries';
+  const dp=document.getElementById('ds-profit');dp.textContent=fmt(profit);dp.className='stat-val '+(profit>=0?'g':'r');
+  const dr=document.getElementById('ds-roi');dr.textContent=roi.toFixed(1)+'%';dr.className='stat-val '+(roi>=0?'gold':'r');
+  const mon=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('ds-mon-lbl').textContent=now.toLocaleDateString('en-PH',{month:'long',year:'numeric'});
+  const mI=fin.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(mon)).reduce((s,t)=>s+t.amount,0);
+  const mE=fin.filter(t=>t.type==='expense'&&t.date&&t.date.startsWith(mon)).reduce((s,t)=>s+t.amount,0);
+  const mP=mI-mE;
+  document.getElementById('ds-m-inc').textContent=fmt(mI);
+  document.getElementById('ds-m-exp').textContent=fmt(mE);
+  document.getElementById('ds-m-prof').textContent=fmt(mP);
+  const mx=Math.max(mI,mE,Math.abs(mP),1);
+  document.getElementById('ds-m-inc-bar').style.width=((mI/mx)*100).toFixed(0)+'%';
+  document.getElementById('ds-m-exp-bar').style.width=((mE/mx)*100).toFixed(0)+'%';
+  document.getElementById('ds-m-prof-bar').style.width=(Math.max(0,mP)/mx*100).toFixed(0)+'%';
+  const td=today();
+  const upcoming=bookings.filter(b=>b.date>=td&&b.status!=='cancelled').sort((a,b)=>a.date<b.date?-1:1).slice(0,3);
+  const uel=document.getElementById('ds-upcoming');
+  if(!upcoming.length){uel.innerHTML=`<div style="color:var(--text4);font-size:13px;padding:10px 0 4px;">No upcoming bookings</div>`;}
+  else uel.innerHTML=upcoming.map(b=>`
+    <div class="list-item">
+      <div class="li-info">
+        <div class="li-title">${b.client}</div>
+        <div class="li-sub">${b.event||'Event'} · ${fmtDate(b.date)}</div>
+        ${b.addons&&b.addons.length?`<div class="li-sub">${b.addons.length} add-on type${b.addons.length===1?'':'s'}</div>`:''}
+      </div>
+      <div class="li-right"><span class="badge ${b.status==='confirmed'?'bg':'bgold'}">${b.status}</span></div>
+    </div>`).join('');
+  const recent=fin.slice().reverse().slice(0,5);
+  const rel=document.getElementById('ds-recent');
+  if(!recent.length){rel.innerHTML=`<div style="color:var(--text4);font-size:13px;padding:10px 0;">No transactions yet</div>`;}
+  else rel.innerHTML=recent.map(t=>`
+    <div class="list-item">
+      <div class="li-info"><div class="li-title">${t.desc}</div><div class="li-sub">${fmtDate(t.date)}</div></div>
+      <div class="li-right"><div class="${t.type==='income'?'amt-pos':'amt-neg'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div></div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════
+function updateClock(){
+  const now=new Date();
+  const el1=document.getElementById('hdrDate');const el2=document.getElementById('hdrTime');
+  if(el1) el1.textContent=now.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'});
+  if(el2) el2.textContent=now.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════
+function renderAll(){
+  renderDashboard();renderSales();renderBookings();renderInventory();renderFinance();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  checkSession();
+  updateClock();setInterval(updateClock,30000);
+  renderAll();renderCalendar();
+  document.getElementById('fab-booking').style.display='flex';
+});
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+const AUTH_USER = 'baby';
+const AUTH_PASS = '031700';
+const SESSION_KEY = 'rfluxe_session';
+
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  const err = document.getElementById('login-error');
+  if(u === AUTH_USER && p === AUTH_PASS){
+    localStorage.setItem(SESSION_KEY, 'true');
+    document.getElementById('login-screen').style.display = 'none';
+    err.style.display = 'none';
+  } else {
+    err.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+    // shake animation
+    const card = document.querySelector('.login-card');
+    card.style.animation = 'none';
+    card.style.transform = 'translateX(8px)';
+    setTimeout(()=>{ card.style.transform = 'translateX(-8px)'; }, 80);
+    setTimeout(()=>{ card.style.transform = 'translateX(5px)'; }, 160);
+    setTimeout(()=>{ card.style.transform = 'translateX(0)'; card.style.transition = 'transform .2s'; }, 240);
+  }
+}
+
+function doLogout(){
+  if(!confirm('Sign out of RF Luxe?')) return;
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function checkSession(){
+  if(localStorage.getItem(SESSION_KEY) === 'true'){
+    document.getElementById('login-screen').style.display = 'none';
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+}
+
+// Allow Enter key on login inputs
+document.addEventListener('DOMContentLoaded', ()=>{
+  ['login-user','login-pass'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  });
+});
+
+// ═══════════════════════════════════════
+// BACKUP & RESTORE
+// ═══════════════════════════════════════
+function doExport(){
+  const data = {
+    exportDate: new Date().toISOString(),
+    version: '3.0',
+    sales:     DB.get('sales'),
+    bookings:  DB.get('bookings'),
+    inventory: DB.get('inventory'),
+    releases:  DB.get('releases'),
+    finance:   DB.get('finance'),
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'rfluxe_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('✦ Backup exported successfully!');
+}
+
+function doImport(){
+  const raw = document.getElementById('import-json').value.trim();
+  if(!raw){ toast('Please paste your backup JSON first'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if(!confirm('This will REPLACE all current data. Continue?')) return;
+    if(data.sales)     DB.set('sales',     data.sales);
+    if(data.bookings)  DB.set('bookings',  data.bookings);
+    if(data.inventory) DB.set('inventory', data.inventory);
+    if(data.releases)  DB.set('releases',  data.releases);
+    if(data.finance)   DB.set('finance',   data.finance);
+    document.getElementById('import-json').value = '';
+    closeModal('modal-import');
+    renderAll();
+    toast('✦ Data restored successfully!');
+  } catch(e){
+    toast('Invalid backup format — check your JSON');
+  }
+}
+
+</script>
+</body>
+</html>
